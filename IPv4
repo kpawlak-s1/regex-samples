@@ -1,0 +1,34 @@
+ipv4 regex = \\d+\\.\\d+\\.\\d+\\.\\d+
+
+\\escapes the string and indicates that we are using a pattern
+d+ describes the variable, which is a digit of 1+ characters (d for digit, + designating its not a single digit necessarily)
+\\. indicates that we are not using the "." regex command but literally looking for the character "."
+this repeats so that we are looking for 
+x.x.x.x
+
+__________________USAGE IN DATASET________________
+
+
+Sample text:
+"......transport: Error while dialing dial tcp 1.1.1.1:443: ...."
+where the dots represent additional portions of the log before and after this section that we care about
+
+want to be able to pull out 1.1.1.1 as an ip
+
+Full parser
+".*transport: Error while dialing dial tcp $ip{regex=\\d+\\.\\d+\\.\\d+\\.\\d+}$:$port=number$: "
+
+breaking this down
+
+" starts the regex 
+. anchors to beginning of text
+* means that we can have any characters and any number of them before the rest of the regex
+transport: Error while dialing dial tcp  is the string we are looking for
+
+so all together we are starting from the beginning of the overall text, passing over any number of characters until finding the string "transport: Error while dialing dial tcp "
+
+once that is found, we are now going to look for the ip pattern
+
+$ip{} designates the name of the pattern, and everyhing inside {} is the regex pattern we will use
+
+and this is where we insert the ipv4 regex from the top
